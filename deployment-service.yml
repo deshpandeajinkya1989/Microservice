@@ -146,11 +146,11 @@ spec:
         image: adijaiswal/recommendationservice:latest
         ports:
         - containerPort: 8080
-        readinessProbe:
+          readinessProbe:
           periodSeconds: 5
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:8080"]
-        livenessProbe:
+          livenessProbe:
           periodSeconds: 5
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:8080"]
@@ -206,7 +206,7 @@ spec:
           readinessProbe:
             initialDelaySeconds: 10
             httpGet:
-              path: "/_healthz"
+              path: "/"
               port: 8080
               httpHeaders:
               - name: "Cookie"
