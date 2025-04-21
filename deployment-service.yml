@@ -1,4 +1,4 @@
----
+  ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -36,14 +36,14 @@ spec:
           value: "8080"
         - name: DISABLE_PROFILER
           value: "1"
-        #readinessProbe:
-          #periodSeconds: 5
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:8080"]
-        #livenessProbe:
-          #periodSeconds: 5
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
         resources:
           requests:
             cpu: 100m
@@ -84,12 +84,12 @@ spec:
           image: adijaiswal/checkoutservice:latest
           ports:
           - containerPort: 5050
-          #readinessProbe:
-            #exec:
-              #command: ["/bin/grpc_health_probe", "-addr=:5050"]
-          #livenessProbe:
-            #exec:
-              #command: ["/bin/grpc_health_probe", "-addr=:5050"]
+          readinessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:5050"]
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:5050"]
           env:
           - name: PORT
             value: "5050"
@@ -146,14 +146,14 @@ spec:
         image: adijaiswal/recommendationservice:latest
         ports:
         - containerPort: 8080
-          #readinessProbe:
-          #periodSeconds: 5
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:8080"]
-          #livenessProbe:
-          #periodSeconds: 5
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
         env:
         - name: PORT
           value: "8080"
@@ -203,16 +203,22 @@ spec:
           image: adijaiswal/frontend:latest
           ports:
           - containerPort: 8080
-          #readinessProbe:
-            #initialDelaySeconds: 10
-            #httpGet:
-              #path: "/"
-              #port: 8080
-          #livenessProbe:
-            #initialDelaySeconds: 10
-            #httpGet:
-              #path: "/"
-              #port: 8080
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/_healthz"
+              port: 8080
+              httpHeaders:
+              - name: "Cookie"
+                value: "shop_session-id=x-readiness-probe"
+          livenessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/_healthz"
+              port: 8080
+              httpHeaders:
+              - name: "Cookie"
+                value: "shop_session-id=x-liveness-probe"
           env:
           - name: PORT
             value: "8080"
@@ -299,12 +305,12 @@ spec:
           value: "50051"
         - name: DISABLE_PROFILER
           value: "1"
-        #readinessProbe:
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        #livenessProbe:
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
         resources:
           requests:
             cpu: 100m
@@ -351,12 +357,12 @@ spec:
           value: "3550"
         - name: DISABLE_PROFILER
           value: "1"
-        #readinessProbe:
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:3550"]
-        #livenessProbe:
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:3550"]
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:3550"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:3550"]
         resources:
           requests:
             cpu: 100m
@@ -408,15 +414,15 @@ spec:
           limits:
             cpu: 300m
             memory: 128Mi
-        #readinessProbe:
-          #initialDelaySeconds: 15
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
-        #livenessProbe:
-          #initialDelaySeconds: 15
-          #periodSeconds: 10
-          #exec:
-            #command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        readinessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        livenessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
 ---
 apiVersion: v1
 kind: Service
@@ -499,8 +505,12 @@ spec:
           value: "7000"
         - name: DISABLE_PROFILER
           value: "1"
-        #readinessProbe:
-        #livenessProbe:
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7000"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7000"]
         resources:
           requests:
             cpu: 100m
@@ -546,8 +556,14 @@ spec:
           value: "50051"
         - name: DISABLE_PROFILER
           value: "1"
-        #readinessProbe:
-         resources:
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        resources:
           requests:
             cpu: 100m
             memory: 64Mi
@@ -586,12 +602,12 @@ spec:
         image: redis:alpine
         ports:
         - containerPort: 6379
-        #readinessProbe:
-          #periodSeconds: 5
+        readinessProbe:
+          periodSeconds: 5
           tcpSocket:
             port: 6379
-        #livenessProbe:
-          #periodSeconds: 5
+        livenessProbe:
+          periodSeconds: 5
           tcpSocket:
             port: 6379
         volumeMounts:
@@ -651,11 +667,16 @@ spec:
           limits:
             cpu: 300m
             memory: 300Mi
-        #readinessProbe:
-          #initialDelaySeconds: 20
-        #livenessProbe:
-          #initialDelaySeconds: 20
-          
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9555"]
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9555"]
 ---
 apiVersion: v1
 kind: Service
